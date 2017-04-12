@@ -117,9 +117,9 @@ public class GateView extends FixedPanel implements ActionListener {
 
 		g.drawImage(image, 50, 20, 184, 140, null);
 		for (int i = 0; i < size;i ++){
-			g.drawLine(28, 30 + i * 40, on[i] ? 10:30, + i * 35 );
-			g.fillArc(20, 80, 30, 30, 0, 180);
-			g.fillArc(20, 50, 30, 30, 0, 180);
+			g.drawLine(30, 40 + i * 40, on[i] ? 10:40, + i * 35 );
+			g.fillArc(20, 40 + i * 40, 25, 25, 0, 180);
+			
 
 		}
 		// Evita bugs visuais em alguns sistemas operacionais.
