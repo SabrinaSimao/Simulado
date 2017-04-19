@@ -2,103 +2,98 @@ package br.pro.hashi.ensino.desagil.lucianogic.view;
 
 import java.awt.Graphics;
 import java.awt.Image;
-import java.awt.event.*;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.net.URL;
 
 import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
-import javax.swing.JButton;
 
 import br.pro.hashi.ensino.desagil.lucianogic.model.Gate;
 import br.pro.hashi.ensino.desagil.lucianogic.model.Switch;
 
 
-public class GateView extends FixedPanel implements ActionListener {
+public class GateView extends FixedPanel implements ItemListener {
 
 	// Necessario para serializar objetos desta classe.
 	private static final long serialVersionUID = 1L;
 
-	private Image image;
-	
 
-	private JButton[] inBoxes;
-	private JCheckBox outBox;
+	private Image image;
+
+	private JCheckBox[] inBoxes;
+	private JCheckBox[] outBox;
 
 	private Switch[] switches;
 	private Gate gate;
-	private int size;
-	private boolean[] on;
-	
 
-	
 
 	public GateView(Gate gate) {
-		super(255, 180);
+		super(205, 180);
 
 		this.gate = gate;
+
 		image = loadImage(gate.toString());
-		size = gate.getSize();
-		inBoxes = new JButton[size];
-		on = new boolean[size];
-		switches = new Switch[size];
 
-		for(int i = 0; i < size; i++) {
-			inBoxes[i] = new JButton();
+		int inSize = gate.getInSize();
+		int outSize = gate.getOutSize();
+		inBoxes = new JCheckBox[inSize];
+		outBox = new JCheckBox[outSize];
+		
+		switches = new Switch[inSize];
 
-			inBoxes[i].addActionListener(this);
-			inBoxes[i].setActionCommand(Integer.toString(i));
-			
-			inBoxes[i].setOpaque(false);
-			inBoxes[i].setContentAreaFilled(false);
-			inBoxes[i].setBorderPainted(false);
+		for(int i = 0; i < inSize; i++) {
+			inBoxes[i] = new JCheckBox();
+
+			inBoxes[i].addItemListener(this);
 
 			switches[i] = new Switch();
-			
-			on[i] = true;
 
 			gate.connect(switches[i], i);
 		}
 
-		outBox = new JCheckBox();
-
-		outBox.setEnabled(false);
-
-		if(size == 1) {
-			add(inBoxes[0], 10, 30, 40, 40);			
+		//aqui eu faço as checkboxes de saida serem que nem as de entrada, podendo mudar a quantidade
+		 		
+		 outBox[0] = new JCheckBox();
+		 outBox[0].setEnabled(false);
+		 if(outSize == 2){
+		 		outBox[1] = new JCheckBox();
+		 		outBox[1].setEnabled(false);
+		 	}
+		
+		if(inSize == 1) {
+			add(inBoxes[0], 0, 60, 20, 20);			
 		}
 		else {
-			for(int i = 0; i < size; i++) {
-				add(inBoxes[i], 10, (i + 1) * 40 - 10, 40, 40);			
+			for(int i = 0; i < inSize; i++) {
+				add(inBoxes[i], 0, (i + 1) * 40, 20, 20);			
 			}			
 		}
 
-		add(outBox, 224, 60, 20, 20);
-
-		outBox.setSelected(gate.read());
+		add(outBox[0], 185, 60, 20, 20);
+		 		
+		 	if(outSize == 2){
+		 		add(outBox[1], 185, 100, 20, 20);
+		 	}
+		 	
 	}
 
 
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void itemStateChanged(ItemEvent event) {
 		int i;
 		for(i = 0; i < inBoxes.length; i++) {
-			if(inBoxes[i] == e.getSource()) {
+			if(inBoxes[i] == event.getSource()) {
 				break;
 			}
 		}
 
-		switches[i].setOn(on[i]);
-		
-		for (int k = 0; k < size;k ++){
-			if(Integer.toString(k).equals(e.getActionCommand())){
-				on[k] = !on[k];
-			}
-		}
-		
+		switches[i].setOn(inBoxes[i].isSelected());
 
-		outBox.setSelected(gate.read());
-		
-		repaint();
+		outBox[0].setSelected(gate.read(0));
+		 	if(outBox.length == 2){
+		 	outBox[1].setSelected(gate.read(1));
+		}
 	}
 
 
@@ -115,15 +110,9 @@ public class GateView extends FixedPanel implements ActionListener {
 		// Evita bugs visuais em alguns sistemas operacionais.
 		super.paintComponent(g);
 
-		g.drawImage(image, 50, 20, 184, 140, null);
-		for (int i = 0; i < size;i ++){
-			g.drawLine(30, 40 + i * 40, on[i] ? 10:40, + i * 35 );
-			g.fillArc(20, 40 + i * 40, 25, 25, 0, 180);
-			
+		g.drawImage(image, 10, 20, 184, 140, null);
 
-		}
 		// Evita bugs visuais em alguns sistemas operacionais.
 		getToolkit().sync();
     }
-	
 }
